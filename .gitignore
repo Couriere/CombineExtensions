@@ -1,0 +1,15 @@
+#ignore osx
+.DS_Store
+
+#ignore Pods
+Pods/
+
+#ignore Carthage
+Carthage/
+
+#ignore share data
+xcuserdata
+timeline.xctimeline
+contents.xcworkspacedata
+contents.xcplayground
+*.xcscheme
