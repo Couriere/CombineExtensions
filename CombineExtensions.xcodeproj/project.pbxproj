@@ -33,6 +33,9 @@
 		AA20531F2451C0C3008C914F /* PrefixDuringLifetimePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20531E2451C0C3008C914F /* PrefixDuringLifetimePublisher.swift */; };
 		AA9F12162450D93E0039C66D /* LifetimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA9F12152450D93E0039C66D /* LifetimeTests.swift */; };
 		AA9F12182450D93E0039C66D /* libCombineExtensions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AA03570A2449966A001FC879 /* libCombineExtensions.a */; };
+		AAB4F32225E6D4AA004534CE /* UIScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F32125E6D4AA004534CE /* UIScheduler.swift */; };
+		AAB4F32325E6D4AA004534CE /* UIScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F32125E6D4AA004534CE /* UIScheduler.swift */; };
+		AAB4F32425E6D4AA004534CE /* UIScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F32125E6D4AA004534CE /* UIScheduler.swift */; };
 		AABE3619257E78AF00256605 /* UIActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA035726244996A7001FC879 /* UIActivityIndicatorView.swift */; };
 		AABE361A257E78AF00256605 /* UITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA035723244996A7001FC879 /* UITabBarController.swift */; };
 		AABE361B257E78AF00256605 /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA035725244996A7001FC879 /* UIButton.swift */; };
@@ -142,6 +145,7 @@
 		AA9F12132450D93E0039C66D /* CombineExtensionsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CombineExtensionsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA9F12152450D93E0039C66D /* LifetimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifetimeTests.swift; sourceTree = "<group>"; };
 		AA9F12172450D93E0039C66D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AAB4F32125E6D4AA004534CE /* UIScheduler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIScheduler.swift; sourceTree = "<group>"; };
 		AABE360B257E788700256605 /* libCombineExtensionsTV.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCombineExtensionsTV.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABE363A257E798B00256605 /* libCombineExtensionsMac.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCombineExtensionsMac.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -216,6 +220,7 @@
 				AA03572C244996A7001FC879 /* Reactive.swift */,
 				AA03572D244996A7001FC879 /* Set+Extensions.swift */,
 				AA03571A244996A6001FC879 /* UIControlEventPublisher.swift */,
+				AAB4F32125E6D4AA004534CE /* UIScheduler.swift */,
 				AA035730244996A7001FC879 /* UnidirectionalBinding.swift */,
 				AA03571C244996A6001FC879 /* WithLatestPublisher.swift */,
 			);
@@ -337,7 +342,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1220;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "MC2 Software";
 				TargetAttributes = {
 					AA0357092449966A001FC879 = {
@@ -392,6 +397,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA035738244996A7001FC879 /* UIView.swift in Sources */,
+				AAB4F32225E6D4AA004534CE /* UIScheduler.swift in Sources */,
 				AA03573D244996A7001FC879 /* UISwitch.swift in Sources */,
 				AA03573E244996A7001FC879 /* UIImageView.swift in Sources */,
 				AA20531F2451C0C3008C914F /* PrefixDuringLifetimePublisher.swift in Sources */,
@@ -431,6 +437,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AABE362C257E78B300256605 /* AnySubscriber+Extension.swift in Sources */,
+				AAB4F32325E6D4AA004534CE /* UIScheduler.swift in Sources */,
 				AABE361D257E78AF00256605 /* UIView.swift in Sources */,
 				AABE3626257E78B300256605 /* Action.swift in Sources */,
 				AABE3620257E78AF00256605 /* UIControl.swift in Sources */,
@@ -461,6 +468,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AABE365F257E79A300256605 /* UIView.swift in Sources */,
+				AAB4F32425E6D4AA004534CE /* UIScheduler.swift in Sources */,
 				AABE365C257E79A300256605 /* UISwitch.swift in Sources */,
 				AABE365D257E79A300256605 /* Action.swift in Sources */,
 				AABE3653257E79A300256605 /* Lifetime.swift in Sources */,
@@ -523,6 +531,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -583,6 +592,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -678,6 +688,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
