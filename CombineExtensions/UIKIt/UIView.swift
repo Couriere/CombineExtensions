@@ -29,5 +29,15 @@ public extension Reactive where Base: UIView {
 	var alpha: BindingTarget<CGFloat> {
 		return makeBindingTarget { $0.alpha = $1 }
 	}
+
+	/// Sets the background color of the view.
+	var backgroundColor: BindingTarget<UIColor> {
+		return makeBindingTarget { $0.backgroundColor = $1 }
+	}
+
+	/// Sets the tintColor of the view
+	var tintColor: BindingTarget<UIColor> {
+		return makeBindingTarget { $0.tintColor = $1 }
+	}
 }
 #endif

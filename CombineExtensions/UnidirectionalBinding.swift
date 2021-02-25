@@ -21,9 +21,9 @@ infix operator <~ : BindingPrecedence
 /// Describes an entity which be bond towards.
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public protocol BindingTargetProvider {
-	associatedtype Intput
+	associatedtype Input
 
-	var bindingTarget: BindingTarget<Intput> { get }
+	var bindingTarget: BindingTarget<Input> { get }
 }
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
@@ -48,7 +48,7 @@ public extension BindingTargetProvider {
 	///            event.
 	@discardableResult
 	static func <~ <Source: Publisher>( provider: Self, source: Source ) -> AnyCancellable
-		where Source.Output == Intput, Source.Failure == Never
+		where Source.Output == Input, Source.Failure == Never
 	{
 		let cancellable = source
 			.prefix( during: provider.bindingTarget.lifetime )
@@ -60,7 +60,7 @@ public extension BindingTargetProvider {
 
 	@discardableResult
 	static func <~ <Source: Publisher>( provider: Self, source: Source ) -> AnyCancellable
-		where Source.Output? == Intput, Source.Failure == Never
+		where Source.Output? == Input, Source.Failure == Never
 	{
 		let cancellable = source
 			.prefix( during: provider.bindingTarget.lifetime )
@@ -115,9 +115,9 @@ public struct BindingTarget<Output>: BindingTargetProvider {
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension Optional: BindingTargetProvider where Wrapped: BindingTargetProvider {
-	public typealias Output = Wrapped.Intput
+	public typealias Output = Wrapped.Input
 
-	public var bindingTarget: BindingTarget<Wrapped.Intput> {
+	public var bindingTarget: BindingTarget<Wrapped.Input> {
 		switch self {
 		case let .some( provider ):
 			return provider.bindingTarget
