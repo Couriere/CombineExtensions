@@ -36,6 +36,9 @@
 		AAB4F32225E6D4AA004534CE /* UIScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F32125E6D4AA004534CE /* UIScheduler.swift */; };
 		AAB4F32325E6D4AA004534CE /* UIScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F32125E6D4AA004534CE /* UIScheduler.swift */; };
 		AAB4F32425E6D4AA004534CE /* UIScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F32125E6D4AA004534CE /* UIScheduler.swift */; };
+		AAB4F35625E7F5ED004534CE /* MutableProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F35525E7F5ED004534CE /* MutableProperty.swift */; };
+		AAB4F35725E7F5ED004534CE /* MutableProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F35525E7F5ED004534CE /* MutableProperty.swift */; };
+		AAB4F35825E7F5ED004534CE /* MutableProperty.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB4F35525E7F5ED004534CE /* MutableProperty.swift */; };
 		AABE3619257E78AF00256605 /* UIActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA035726244996A7001FC879 /* UIActivityIndicatorView.swift */; };
 		AABE361A257E78AF00256605 /* UITabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA035723244996A7001FC879 /* UITabBarController.swift */; };
 		AABE361B257E78AF00256605 /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA035725244996A7001FC879 /* UIButton.swift */; };
@@ -146,6 +149,7 @@
 		AA9F12152450D93E0039C66D /* LifetimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifetimeTests.swift; sourceTree = "<group>"; };
 		AA9F12172450D93E0039C66D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AAB4F32125E6D4AA004534CE /* UIScheduler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIScheduler.swift; sourceTree = "<group>"; };
+		AAB4F35525E7F5ED004534CE /* MutableProperty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MutableProperty.swift; sourceTree = "<group>"; };
 		AABE360B257E788700256605 /* libCombineExtensionsTV.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCombineExtensionsTV.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		AABE363A257E798B00256605 /* libCombineExtensionsMac.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libCombineExtensionsMac.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -215,6 +219,7 @@
 				AA03572F244996A7001FC879 /* Lifetime.swift */,
 				AA03571B244996A6001FC879 /* EnsurePublisher.swift */,
 				AA03571E244996A6001FC879 /* Property.swift */,
+				AAB4F35525E7F5ED004534CE /* MutableProperty.swift */,
 				AA03572B244996A7001FC879 /* Publisher+Extensions.swift */,
 				AA20531E2451C0C3008C914F /* PrefixDuringLifetimePublisher.swift */,
 				AA03572C244996A7001FC879 /* Reactive.swift */,
@@ -406,6 +411,7 @@
 				AA035735244996A7001FC879 /* Property.swift in Sources */,
 				AA035743244996A7001FC879 /* Set+Extensions.swift in Sources */,
 				AA035736244996A7001FC879 /* Action.swift in Sources */,
+				AAB4F35625E7F5ED004534CE /* MutableProperty.swift in Sources */,
 				AA035744244996A7001FC879 /* AnyPublisher+Closure.swift in Sources */,
 				AA035742244996A7001FC879 /* Reactive.swift in Sources */,
 				AA035741244996A7001FC879 /* Publisher+Extensions.swift in Sources */,
@@ -446,6 +452,7 @@
 				AABE3631257E78B300256605 /* Lifetime.swift in Sources */,
 				AABE362E257E78B300256605 /* UIControlEventPublisher.swift in Sources */,
 				AABE3625257E78B300256605 /* Publisher+Extensions.swift in Sources */,
+				AAB4F35725E7F5ED004534CE /* MutableProperty.swift in Sources */,
 				AABE3628257E78B300256605 /* EnsurePublisher.swift in Sources */,
 				AABE3621257E78AF00256605 /* UILabel.swift in Sources */,
 				AABE362F257E78B300256605 /* Property.swift in Sources */,
@@ -477,6 +484,7 @@
 				AABE3658257E79A300256605 /* UIImageView.swift in Sources */,
 				AABE3662257E79A300256605 /* UITabBarController.swift in Sources */,
 				AABE365E257E79A300256605 /* UIControlEventPublisher.swift in Sources */,
+				AAB4F35825E7F5ED004534CE /* MutableProperty.swift in Sources */,
 				AABE3654257E79A300256605 /* AnyPublisher+Pipe.swift in Sources */,
 				AABE364D257E79A300256605 /* PrefixDuringLifetimePublisher.swift in Sources */,
 				AABE364F257E79A300256605 /* UIControl.swift in Sources */,
