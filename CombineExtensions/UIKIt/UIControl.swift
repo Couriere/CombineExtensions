@@ -17,11 +17,11 @@ public extension Reactive where Base: UIControl {
 	}
 
 	var isEnabled: BindingTarget<Bool> {
-		return makeUIBindingTarget { $0.isEnabled = $1 }
+		return makeBindingTarget { $0.isEnabled = $1 }
 	}
 
 	var isSelected: BindingTarget<Bool> {
-		return makeUIBindingTarget { $0.isSelected = $1 }
+		return makeBindingTarget { $0.isSelected = $1 }
 	}
 
 	func mapControlEvents<Value>( _ controlEvents: UIControl.Event,

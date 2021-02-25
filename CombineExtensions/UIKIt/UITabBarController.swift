@@ -15,12 +15,12 @@ public extension Reactive where Base: UITabBarController {
 
 	/// Sets the selected tab index.
 	var selectedIndex: BindingTarget<Int> {
-		return makeUIBindingTarget { $0.selectedIndex = $1 }
+		return makeBindingTarget { $0.selectedIndex = $1 }
 	}
 
 	/// Sets the selected view controller.
 	var selectedViewController: BindingTarget<UIViewController?> {
-		return makeUIBindingTarget { $0.selectedViewController = $1 }
+		return makeBindingTarget { $0.selectedViewController = $1 }
 	}
 }
 

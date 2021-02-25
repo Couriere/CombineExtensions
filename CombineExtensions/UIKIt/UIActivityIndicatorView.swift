@@ -13,7 +13,7 @@ import Combine
 public extension Reactive where Base: UIActivityIndicatorView {
 
 	var isAnimating: BindingTarget<Bool> {
-		return makeUIBindingTarget { $1 ? $0.startAnimating() : $0.stopAnimating() }
+		return makeBindingTarget { $1 ? $0.startAnimating() : $0.stopAnimating() }
 	}
 }
 #endif

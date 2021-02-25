@@ -13,12 +13,12 @@ import Combine
 public extension Reactive where Base: UIImageView {
 	/// Sets the image of the image view.
 	var image: BindingTarget<UIImage?> {
-		return makeUIBindingTarget { $0.image = $1 }
+		return makeBindingTarget { $0.image = $1 }
 	}
 
 	/// Sets the image of the image view for its highlighted state.
 	var highlightedImage: BindingTarget<UIImage?> {
-		return makeUIBindingTarget { $0.highlightedImage = $1 }
+		return makeBindingTarget { $0.highlightedImage = $1 }
 	}
 }
 #endif

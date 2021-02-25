@@ -13,19 +13,19 @@ import Combine
 @available(iOS 13, tvOS 13, watchOS 6, *)
 public extension Reactive where Base: UITextField {
 
-	/// Sets the text of the UITextField.
+	/// Sets the text of the text field.
 	var text: BindingTarget<String?> {
-		return makeUIBindingTarget { $0.text = $1 }
+		return makeBindingTarget { $0.text = $1 }
 	}
 
-	/// Sets the attributed text of the UITextField.
+	/// Sets the attributed text of the text field.
 	var attributedText: BindingTarget<NSAttributedString?> {
-		return makeUIBindingTarget { $0.attributedText = $1 }
+		return makeBindingTarget { $0.attributedText = $1 }
 	}
 
-	/// Sets the color of the text of the UITextField.
+	/// Sets the textColor of the text field.
 	var textColor: BindingTarget<UIColor> {
-		return makeUIBindingTarget { $0.textColor = $1 }
+		return makeBindingTarget { $0.textColor = $1 }
 	}
 }
 #endif

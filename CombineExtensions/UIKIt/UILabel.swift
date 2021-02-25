@@ -14,17 +14,17 @@ public extension Reactive where Base: UILabel {
 
 	/// Sets the text of the label.
 	var text: BindingTarget<String?> {
-		return makeUIBindingTarget { $0.text = $1 }
+		return makeBindingTarget { $0.text = $1 }
 	}
 
 	/// Sets the attributed text of the label.
 	var attributedText: BindingTarget<NSAttributedString?> {
-		return makeUIBindingTarget { $0.attributedText = $1 }
+		return makeBindingTarget { $0.attributedText = $1 }
 	}
 
 	/// Sets the color of the text of the label.
 	var textColor: BindingTarget<UIColor> {
-		return makeUIBindingTarget { $0.textColor = $1 }
+		return makeBindingTarget { $0.textColor = $1 }
 	}
 }
 #endif

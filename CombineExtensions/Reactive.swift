@@ -69,8 +69,11 @@ public extension Reactive where Base: AnyObject {
 	///
 	/// - returns: A binding target that holds no strong references to the
 	///            object.
-	func makeBindingTarget<U>( _ action: @escaping (Base, U) -> Void) -> BindingTarget<U> {
-		return BindingTarget( lifetime: Lifetime.of( base )) { [weak base = self.base] value in
+	func makeBindingTarget<U, S: Scheduler>(
+		scheduler: S,
+		_ action: @escaping (Base, U) -> Void
+	) -> BindingTarget<U> {
+		return BindingTarget( on: scheduler, lifetime: Lifetime.of( base )) { [weak base = self.base] value in
 			if let base = base {
 				action(base, value)
 			}
@@ -79,18 +82,15 @@ public extension Reactive where Base: AnyObject {
 
 	/// Creates a binding target which weakly references the object so that
 	/// the supplied `action` is triggered only if the object has not deinitialized.
-	/// Action is guarantee to be executed on main thread.
+	/// `action` is triggered on the main thread.
 	///
 	/// - parameters:
 	///   - action: The action to consume values from the bindings.
 	///
 	/// - returns: A binding target that holds no strong references to the
 	///            object.
-	func makeUIBindingTarget<U>( _ action: @escaping (Base, U) -> Void) -> BindingTarget<U> {
-		return BindingTarget( on: DispatchQueue.main, lifetime: Lifetime.of( base )) { [weak base = self.base] value in
-			if let base = base {
-				action(base, value)
-			}
-		}
+	@inline( __always )
+	func makeBindingTarget<U>( _ action: @escaping (Base, U) -> Void ) -> BindingTarget<U> {
+		makeBindingTarget( on: UIScheduler(), action )
 	}
 }

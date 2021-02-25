@@ -19,7 +19,7 @@ public extension Reactive where Base: UISwitch {
 	}
 
 	var isOn: BindingTarget<Bool> {
-		return makeUIBindingTarget { $0.isOn = $1 }
+		return makeBindingTarget { $0.isOn = $1 }
 	}
 }
 
