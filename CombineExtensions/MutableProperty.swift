@@ -36,6 +36,7 @@ public class MutableProperty<Output> {
 	}
 }
 
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension MutableProperty: BindingTargetProvider {
 
 	public var bindingTarget: BindingTarget<Output> {

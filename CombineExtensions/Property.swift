@@ -8,11 +8,16 @@
 import Combine
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+@propertyWrapper
 public class Property<Output>: Publisher {
 
 	public typealias Failure = Never
 
 	public var value: Output { underlyingSubject.value }
+
+	public var wrappedValue: Output { return value }
+
+	public var projectedValue: Property<Output> { return self }
 
 	public init( _ initialValue: Output ) {
 		underlyingSubject = CurrentValueSubject<Output, Failure>( initialValue )
@@ -27,6 +32,12 @@ public class Property<Output>: Publisher {
 	public init( _ subject: CurrentValueSubject<Output, Never> ) {
 		underlyingSubject = CurrentValueSubject<Output, Failure>( subject.value )
 		thenPublisherCancellable = subject.assign( to: \.value, on: underlyingSubject )
+	}
+
+	public init( _ mutableProperty: MutableProperty<Output> ) {
+		underlyingSubject = CurrentValueSubject<Output, Never>( mutableProperty.value )
+		thenPublisherCancellable = mutableProperty.underlyingSubject
+			.assign( to: \.value, on: underlyingSubject )
 	}
 
 	public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
