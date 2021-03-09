@@ -57,6 +57,7 @@ class LifetimeTests: XCTestCase {
 		wait( for: [ signalPassedExpectation, lifetimeEndedExpectation ], timeout: 1 )
     }
 
+
 	class TestSubject {
 
 		var testString: String = ""
@@ -73,7 +74,7 @@ class LifetimeTests: XCTestCase {
 		private var cancellable: AnyCancellable?
 	}
 
-	func testPrefixDuringLifetime2() {
+	func testLifetimeRetainCycle() {
 
 		let ( lifetime, token ) = Lifetime.make()
 

@@ -154,7 +154,7 @@ public final class Action<Input, Output, Failure: Error> {
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension Action: BindingTargetProvider {
 	public var bindingTarget: BindingTarget<Input> {
-		return BindingTarget( lifetime: Lifetime.of( self )) { self.inputs.send( $0 ) }
+		return BindingTarget( lifetime: Lifetime.of( self )) { [weak self] in self?.inputs.send( $0 ) }
 	}
 }
 

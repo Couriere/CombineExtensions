@@ -59,6 +59,6 @@ public class MutableProperty<Output> {
 extension MutableProperty: BindingTargetProvider {
 
 	public var bindingTarget: BindingTarget<Output> {
-		return BindingTarget( lifetime: Lifetime.of( self )) { self.underlyingSubject.value = $0 }
+		return BindingTarget( lifetime: Lifetime.of( self )) { [weak self] in self?.underlyingSubject.value = $0 }
 	}
 }

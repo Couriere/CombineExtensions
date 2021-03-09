@@ -83,15 +83,16 @@ public extension Publishers.PrefixDuringLifetimePublisher {
 			self.subscriber = subscriber
 
 			guard !lifetime.hasEnded else {
-				self.subscriber?.receiveCompletion()
-				self.subscriber = nil
+				cancel()
 				return
 			}
 
 			lifetime.observeEnded {
-				self.subscriber?.receiveCompletion()
-				self.subscriber = nil
+				self.cancel()
 			}
+		}
+		deinit {
+			Swift.print()
 		}
 
 		public func request( _ demand: Subscribers.Demand ) {
@@ -100,13 +101,15 @@ public extension Publishers.PrefixDuringLifetimePublisher {
 
 			subscription = upstream.sink( receiveCompletion: { completion in
 				self.subscriber?.receive( completion: completion )
-				self.subscription = nil
+				self.subscriber = nil
 			}, receiveValue: { value in
 				_ = self.subscriber?.receive( value )
 			})
 		}
 
 		public func cancel() {
+			self.subscription?.cancel()
+			self.subscriber?.receiveCompletion()
 			self.subscriber = nil
 		}
 
@@ -116,4 +119,3 @@ public extension Publishers.PrefixDuringLifetimePublisher {
 		private var subscription: AnyCancellable?
 	}
 }
-

@@ -148,14 +148,14 @@ extension Optional: BindingTargetProvider where Wrapped: BindingTargetProvider {
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension CurrentValueSubject: BindingTargetProvider where Failure == Never {
 	public var bindingTarget: BindingTarget<Output> {
-		return BindingTarget( lifetime: Lifetime.of( self )) { self.value = $0 }
+		return BindingTarget( lifetime: Lifetime.of( self )) { [weak self] in self?.value = $0 }
 	}
 }
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension PassthroughSubject: BindingTargetProvider where Failure == Never {
 	public var bindingTarget: BindingTarget<Output> {
-		return BindingTarget( lifetime: Lifetime.of( self )) { self.send( $0 ) }
+		return BindingTarget( lifetime: Lifetime.of( self )) { [weak self] in self?.send( $0 ) }
 	}
 }
 

@@ -85,4 +85,51 @@ class UnidirectionalBindingTests: XCTestCase {
 		wait( for: [ valueMinusOneExpectation ], timeout: 1 )
 		XCTAssert( value == -1 )
 	}
+
+	func testReceiveCancelledOnDeinit() {
+
+		var subject: CurrentValueSubject<Int, Never>? = CurrentValueSubject<Int, Never>( 0 )
+		weak var subjectw = subject
+
+		let inputSubject = PassthroughSubject<Int, Never>()
+
+
+		let cancelledExpectation = XCTestExpectation()
+		subject! <~ inputSubject
+			.handleEvents( receiveCancel: {
+				cancelledExpectation.fulfill()
+			})
+
+		inputSubject.send(101)
+		XCTAssertEqual( subject!.value, 101)
+
+		subject = nil
+		XCTAssertNil(subjectw)
+
+		wait( for: [ cancelledExpectation ], timeout: 1.1 )
+	}
+
+	func testBindingProvidersAreNotRetained() {
+
+		func test<Provider: BindingTargetProvider>( _ provider: inout Provider? ) where Provider: AnyObject, Provider.Input == Int {
+			weak var weakProvider = provider
+
+			let currentValueSubject = CurrentValueSubject<Int, Never>( 101 )
+
+			provider! <~ currentValueSubject
+
+			provider = nil
+			XCTAssertNil( weakProvider )
+		}
+
+		var currentValueSubject: CurrentValueSubject<Int, Never>? = .init( 0 )
+		var passthroughSubject: PassthroughSubject<Int, Never>? = .init()
+		var mutableProperty: MutableProperty<Int>? = .init( 10 )
+		var action: Action<Int, Int, Never>? = .init { value in Just( value ).eraseToAnyPublisher() }
+
+		test( &currentValueSubject )
+		test( &passthroughSubject )
+		test( &mutableProperty )
+		test( &action )
+	}
 }
