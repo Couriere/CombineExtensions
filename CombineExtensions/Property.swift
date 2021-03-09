@@ -23,11 +23,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+import Foundation
 import Combine
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 @propertyWrapper
-public class Property<Output>: Publisher {
+public final class Property<Output>: Publisher {
 
 	public typealias Failure = Never
 
@@ -37,31 +38,56 @@ public class Property<Output>: Publisher {
 
 	public var projectedValue: Property<Output> { return self }
 
-	public init( _ initialValue: Output ) {
-		underlyingSubject = CurrentValueSubject<Output, Failure>( initialValue )
+	public init( value: Output ) {
+		underlyingSubject = CurrentValueSubject<Output, Never>( value )
 	}
 
 	public init<PublisherType: Publisher>( initial: Output, then values: PublisherType )
 		where PublisherType.Failure == Never, Output == PublisherType.Output  {
-			underlyingSubject = CurrentValueSubject<Output, Failure>( initial )
+			underlyingSubject = CurrentValueSubject<Output, Never>( initial )
 			thenPublisherCancellable = values.assign( to: \.value, on: underlyingSubject )
 	}
 
 	public init( _ subject: CurrentValueSubject<Output, Never> ) {
-		underlyingSubject = CurrentValueSubject<Output, Failure>( subject.value )
+		underlyingSubject = CurrentValueSubject<Output, Never>( subject.value )
 		thenPublisherCancellable = subject.assign( to: \.value, on: underlyingSubject )
 	}
 
 	public init( _ mutableProperty: MutableProperty<Output> ) {
 		underlyingSubject = CurrentValueSubject<Output, Never>( mutableProperty.value )
-		thenPublisherCancellable = mutableProperty.underlyingSubject
+		thenPublisherCancellable = mutableProperty
 			.assign( to: \.value, on: underlyingSubject )
 	}
 
-	public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
 		underlyingSubject.receive( subscriber: subscriber )
 	}
 
 	private var thenPublisherCancellable: AnyCancellable?
-	private let underlyingSubject: CurrentValueSubject<Output, Failure>
+	private let underlyingSubject: CurrentValueSubject<Output, Never>
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension Property: Equatable where Output: Equatable {
+	public static func == ( lhs: Property<Output>, rhs: Property<Output> ) -> Bool {
+		lhs.value == rhs.value
+	}
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension Property: Hashable where Output: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine( value )
+	}
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension Property: Codable where Output: Codable {
+	public convenience init(from decoder: Decoder) throws {
+		self.init( value: try Output.init( from: decoder ))
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		try value.encode( to: encoder )
+	}
 }
