@@ -27,6 +27,7 @@ import XCTest
 import Combine
 import CombineExtensions
 
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 class UnidirectionalBindingTests: XCTestCase {
 
 	let ( lifetime, token ) = Lifetime.make()

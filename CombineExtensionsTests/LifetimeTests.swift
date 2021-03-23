@@ -27,16 +27,19 @@ import XCTest
 import Combine
 import CombineExtensions
 
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 class LifetimeTests: XCTestCase {
 
 	var cancellable: AnyCancellable?
+
+	class LifetimeDummy {}
 
 	func testPrefixDuringLifetime() {
 
 		let lifetimeEndedExpectation = expectation( description: "Lifetime has ended" )
 		let signalPassedExpectation = expectation( description: "Text signal has passed" )
 
-		var lifetimeDummy: UILabel? = UILabel()
+		var lifetimeDummy: LifetimeDummy? = LifetimeDummy()
 
 		cancellable =
 			Empty<String, Never>( completeImmediately: false )
