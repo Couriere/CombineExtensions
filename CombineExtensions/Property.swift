@@ -42,6 +42,10 @@ public final class Property<Output>: Publisher {
 		underlyingSubject = CurrentValueSubject<Output, Never>( value )
 	}
 
+	public init( wrappedValue: Output ) {
+		underlyingSubject = CurrentValueSubject<Output, Never>( wrappedValue )
+	}
+
 	public init<PublisherType: Publisher>( initial: Output, then values: PublisherType )
 		where PublisherType.Failure == Never, Output == PublisherType.Output  {
 			underlyingSubject = CurrentValueSubject<Output, Never>( initial )
