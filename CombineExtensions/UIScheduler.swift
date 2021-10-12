@@ -53,7 +53,8 @@ public struct UIScheduler: Scheduler {
 		options: SchedulerOptions? = nil,
 		_ action: @escaping () -> Void
 	) {
-		if Thread.isMainThread {
+		// On iOS prior to 13.4 this line causes crash.
+		if Thread.isMainThread, #available( iOS 13.4, * ) {
 			action()
 		} else {
 			DispatchQueue.main.schedule(action)
