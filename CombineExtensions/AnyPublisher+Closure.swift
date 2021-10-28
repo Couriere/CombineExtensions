@@ -29,19 +29,18 @@ import Combine
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public extension AnyPublisher {
 
-	init( _ closure: @escaping ( AnySubscriber<Output, Failure>, Lifetime ) -> Void ) {
+	init( _ closure: @escaping ( AnyObserver<Output, Failure>, Lifetime ) -> Void ) {
 		let publisher = Publishers.ClosurePublisher( closure: closure )
 		self.init( publisher )
 	}
 }
-
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public extension Publishers {
 
 	struct ClosurePublisher<Output, Failure>: Publisher where Failure: Error {
 
-		public typealias InitClosure = ( AnySubscriber<Output, Failure>, Lifetime ) -> Void
+		public typealias InitClosure = ( AnyObserver<Output, Failure>, Lifetime ) -> Void
 
 		private let closure: InitClosure
 
@@ -67,11 +66,10 @@ public extension Publishers.ClosurePublisher {
 
 		init( subscriber: SubscriberType, closure: @escaping InitClosure ) {
 			self.subscriber = subscriber
-			let observer = AnySubscriber<Output, Failure>(
-				receiveSubscription: nil,
-				receiveValue: { [weak self] value in
-					return self?.subscriber?.receive( value ) ?? .none },
-				receiveCompletion: { [weak self] completion in
+			let observer = AnyObserver<Output, Failure>(
+				sendValue: { [weak self] value in
+					_ = self?.subscriber?.receive( value ) },
+				sendCompletion: { [weak self] completion in
 					self?.subscriber?.receive( completion: completion ) }
 			)
 			closure( observer, lifetime.lifetime )

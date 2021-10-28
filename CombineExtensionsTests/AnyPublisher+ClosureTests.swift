@@ -45,8 +45,8 @@ class AnyPublisherClosureTests: XCTestCase {
 		let asyncPublisher = AnyPublisher<Int, _Error> { sink, _ in
 
 			DispatchQueue.global().asyncAfter( deadline: .now() + 0.5) {
-				_ = sink.receive( 10 )
-				sink.receiveCompletion()
+				sink.send( 10 )
+				sink.sendFinished()
 			}
 		}
 
@@ -74,7 +74,7 @@ class AnyPublisherClosureTests: XCTestCase {
 		let asyncPublisher = AnyPublisher<Int, _Error> { sink, _ in
 
 			DispatchQueue.global().asyncAfter( deadline: .now() + 0.5 ) {
-				sink.receive( error: .sampleError )
+				sink.send( .sampleError )
 			}
 		}
 
@@ -127,8 +127,8 @@ class AnyPublisherClosureTests: XCTestCase {
 	func testSyncSuccess() {
 
 		let syncPublisher = AnyPublisher<Int, _Error> { sink, _ in
-			_ = sink.receive( 10 )
-			sink.receiveCompletion()
+			sink.send( 10 )
+			sink.sendFinished()
 		}
 
 		let valueExpectation = XCTestExpectation( description: "Success value received" )
