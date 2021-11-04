@@ -26,127 +26,148 @@
 import Foundation
 import Combine
 
-/// Typealias for compatibility with UI controls control events properties.
-@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
-public typealias CocoaAction = Action<Void, Void, Never>
-
-/// Possible errors from invoking execute()
-@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
-public enum ActionError<Failure: Error>: Error {
-    case notEnabled
-    case failure( Failure )
-}
 
 /**
-Represents a value that accepts a workFactory which takes some Observable<Input> as its input
-and produces an Observable<Element> as its output.
+ Represents a value that accepts a workFactory which takes some Observable<Input> as its input
+ and produces an Observable<Element> as its output.
 
-When this excuted via execute() or inputs subject, it passes its parameter to this closure and subscribes to the work.
-*/
+ When this excuted via execute() or inputs subject, it passes its parameter to this closure and subscribes to the work.
+ */
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public final class Action<Input, Output, Failure: Error> {
-    public typealias WorkFactory = (Input) -> AnyPublisher<Output, Failure>
+	public typealias WorkFactory = (Input) -> AnyPublisher<Output, Failure>
 
-    public let workFactory: WorkFactory
+	public let workFactory: WorkFactory
 
-    /// Bindable sink for inputs that triggers execution of action.
-    public let inputs: PassthroughSubject<Input, Never>
+	/// Bindable sink for inputs that triggers execution of action.
+	public let inputs: PassthroughSubject<Input, Never>
 
 	/// Whether or not we're currently executing.
 	/// Delivered on whatever scheduler they were sent from.
 	public let values: AnyPublisher<Output, Never>
 
-    /// Errors aggrevated from invocations of execute().
-    /// Delivered on whatever scheduler they were sent from.
+	/// Errors aggrevated from invocations of execute().
+	/// Delivered on whatever scheduler they were sent from.
 	public let errors: AnyPublisher<Failure, Never>
 
 	/// A signal of all failed attempts to start a unit of work of the `Action`.
 	/// Delivered on whatever scheduler they were sent from.
 	public let disabledErrors: AnyPublisher<Void, Never>
 
-    /// Whether or not we're currently executing.
-    public let isExecuting: Property<Bool>
+	/// Whether or not we're currently executing.
+	public let isExecuting: Property<Bool>
 
-    /// Observables returned by the workFactory.
-    /// Useful for sending results back from work being completed
-    /// e.g. response from a network call.
-    public let executionObservables: AnyPublisher<AnyPublisher<Output, Failure>, Never>
+	/// Observables returned by the workFactory.
+	/// Useful for sending results back from work being completed
+	/// e.g. response from a network call.
+	public let executionObservables: AnyPublisher<AnyPublisher<Output, ActionError<Failure>>, Never>
 
-    /// Whether or not we're enabled. Value of this property
-    /// based on enabledIf initializer and if we're currently executing.
+	/// Whether or not we're enabled. Value of this property
+	/// based on enabledIf initializer and if we're currently executing.
 	public let isEnabled: Property<Bool>
 
 	public convenience init<PublisherType: Publisher>(
 		enabledIf: CurrentValueSubject<Bool, Never> = .init( true ),
-        workFactory: @escaping (Input) -> PublisherType
+		workFactory: @escaping (Input) -> PublisherType
 	) where Output == PublisherType.Output, Failure == PublisherType.Failure {
-        self.init( enabledIf: enabledIf ) {
-            workFactory( $0 ).eraseToAnyPublisher()
-        }
-    }
+		self.init( enabledIf: enabledIf ) {
+			workFactory( $0 ).eraseToAnyPublisher()
+		}
+	}
 
-    public init(
+	public init(
 		enabledIf: CurrentValueSubject<Bool, Never> = .init( true ),
-        workFactory: @escaping WorkFactory
+		workFactory: @escaping WorkFactory
 	) {
-
-        self.workFactory = workFactory
+		self.workFactory = workFactory
 
 		let _isEnabled = CurrentValueSubject<Bool, Never>( true )
 		isEnabled = Property( _isEnabled )
 
-		let errorsSubject = PassthroughSubject<ActionError<Failure>, Never>()
-		errors = errorsSubject.compactMap { $0.failure }.eraseToAnyPublisher()
-		disabledErrors = errorsSubject.filter { $0.isDisabled }.map { _ in () }.eraseToAnyPublisher()
+		let inputsSubject = PassthroughSubject<Input, Never>()
+		inputs = inputsSubject
 
-        let inputsSubject = PassthroughSubject<Input, Never>()
-        inputs = inputsSubject
-
-        executionObservables = inputsSubject
+		executionObservables = inputsSubject
 			.withLatest( from: _isEnabled ) { input, enabled in (input, enabled) }
-            .flatMap { input, enabled -> AnyPublisher<AnyPublisher<Output, Failure>, Never> in
-                if enabled {
-					return Just<AnyPublisher<Output, Failure>>(
-						workFactory( input )
-							.handleEvents( receiveCompletion: {
-								if case let .failure( error ) = $0 {
-									errorsSubject.send( .failure( error ))
-								}
-							} )
-							.share()
-							.eraseToAnyPublisher()
-						)
+			.flatMap { input, enabled -> AnyPublisher<AnyPublisher<Output, ActionError<Failure>>, Never> in
+				if enabled {
+					let workPublisher = workFactory( input )
+						.mapError { ActionError.failed( $0 ) }
+						.replayLazily()
 						.eraseToAnyPublisher()
-                } else {
-					errorsSubject.send( .notEnabled )
-					return Empty<AnyPublisher<Output, Failure>, Never>()
-						.eraseToAnyPublisher()
-                }
-            }
-            .share()
+					return Just( workPublisher ).eraseToAnyPublisher()
+				} else {
+					return AnyPublisher( value: AnyPublisher( error: ActionError<Failure>.disabled ))
+				}
+			}
+			.share()
 			.eraseToAnyPublisher()
 
 		values = executionObservables
 			.flatMap { $0.catch { _ in Empty( completeImmediately: false ) } }
 			.eraseToAnyPublisher()
 
+		let errorsSubject = executionObservables
+			.flatMap { execution -> AnyPublisher<ActionError<Failure>, Never> in
+				execution
+					.flatMap { _ in AnyPublisher( completeImmediately: false ) }
+					.catch { AnyPublisher( value: $0 ) }
+					.eraseToAnyPublisher()
+			}
+		errors = errorsSubject.compactMap { $0.failure }.eraseToAnyPublisher()
+		disabledErrors = errorsSubject.filter { $0.isDisabled }.map { _ in () }.eraseToAnyPublisher()
+
+
 		let _isExecuting = executionObservables
 			.flatMap { execution -> AnyPublisher<Bool, Never> in
 				let execution = execution
-					.flatMap { _ in Empty<Bool, Failure>() }
+					.flatMap { _ in Empty<Bool, ActionError<Failure>>() }
 					.catch { _ in Empty<Bool, Never>() }
 
 				return execution
 					.prepend( true )
 					.append( false )
 					.eraseToAnyPublisher()
-		}
+			}
 
 		isExecuting = Property( initial: false, then: _isExecuting )
 
 		cancellables += _isEnabled <~ Publishers.CombineLatest( isExecuting.prepend( false ), enabledIf )
 			.map { !$0 && $1 }
-    }
+	}
+
+
+	public func apply( _ input: Input ) -> AnyPublisher<Output, ActionError<Failure>> {
+		defer {
+			self.inputs.send( input )
+		}
+
+		let replay = ReplaySubject<Output, ActionError<Failure>>()
+		cancellables += executionObservables
+			.prefix( during: bindingTarget.lifetime )
+			.prefix( 1 )
+			.setFailureType( to: ActionError<Failure>.self )
+			.flatMap { $0 }
+			.sink {
+				replay.send( completion: $0 )
+			} receiveValue: {
+				replay.send( $0 )
+			}
+
+		return AnyPublisher( replay )
+	}
+
+	public func applyIgnoringDisabled(
+		_ input: Input
+	) -> Publishers.Catch<AnyPublisher<Output, ActionError<Failure>>, AnyPublisher<Output, Failure>> {
+		return apply( input )
+			.catch { actionError -> AnyPublisher<Output, Failure> in
+				switch actionError {
+				case .disabled: return AnyPublisher( completeImmediately: false )
+				case .failed( let error ): return AnyPublisher( error: error )
+				}
+			}
+	}
 
 	private var cancellables: Set<AnyCancellable> = []
 }
@@ -159,8 +180,26 @@ extension Action: BindingTargetProvider {
 }
 
 
+/// Possible errors from invoking execute()
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
-private extension ActionError {
-	var failure: Failure? { if case .failure( let failure ) = self { return failure }; return nil }
-	var isDisabled: Bool { if case .notEnabled = self { return true }; return false }
+public enum ActionError<Failure: Error>: Error {
+	case disabled
+	case failed( Failure )
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension ActionError {
+	public var failure: Failure? { if case .failed( let failure ) = self { return failure }; return nil }
+	public var isDisabled: Bool { if case .disabled = self { return true }; return false }
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension ActionError: Equatable where Failure: Equatable {
+	public static func == (lhs: ActionError<Failure>, rhs: ActionError<Failure>) -> Bool {
+		switch (lhs, rhs) {
+		case (.disabled, .disabled): return true
+		case let (.failed( left ), .failed( right )): return left == right
+		default: return false
+		}
+	}
 }

@@ -114,3 +114,9 @@ public extension Publishers {
 		}
 	}
 }
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+public extension Subscribers.Completion {
+	var error: Failure? { if case .failure( let error ) = self { return error }; return nil }
+	var isCompleted: Bool { if case .finished = self { return true }; return false }
+}
