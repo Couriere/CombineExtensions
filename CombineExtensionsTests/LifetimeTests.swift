@@ -95,4 +95,43 @@ class LifetimeTests: XCTestCase {
 		token.cancel()
 		XCTAssertNil( testWeakSubject )
 	}
+
+	func testCancellableWithId() {
+		let ( lifetime, token ) = Lifetime.make()
+
+		// warning silenced
+		_ = token
+
+		let id1 = "id1"
+		let id2 = "id2"
+
+		var id1Cancelled = false
+		var id2Cancelled = false
+
+		XCTAssertFalse( lifetime.contains( id: id1 ))
+		XCTAssertFalse( lifetime.contains( id: id2 ))
+
+		lifetime.observeEnded( id: id1 ) { id1Cancelled = true }
+		XCTAssertTrue( lifetime.contains( id: id1 ))
+		XCTAssertFalse( lifetime.contains( id: id2 ))
+
+		AnyCancellable( { id2Cancelled = true } )
+			.store( in: lifetime, id: id2 )
+		XCTAssertTrue( lifetime.contains( id: id1 ))
+		XCTAssertTrue( lifetime.contains( id: id2 ))
+		XCTAssertFalse( id1Cancelled )
+		XCTAssertFalse( id2Cancelled )
+
+		lifetime.remove( id: id1 )
+		XCTAssertFalse( lifetime.contains( id: id1 ))
+		XCTAssertTrue( lifetime.contains( id: id2 ))
+		XCTAssertTrue( id1Cancelled )
+		XCTAssertFalse( id2Cancelled )
+
+		lifetime.remove( id: id2 )
+		XCTAssertFalse( lifetime.contains( id: id1 ))
+		XCTAssertFalse( lifetime.contains( id: id2 ))
+		XCTAssertTrue( id1Cancelled )
+		XCTAssertTrue( id2Cancelled )
+	}
 }

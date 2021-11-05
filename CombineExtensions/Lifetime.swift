@@ -35,8 +35,24 @@ public final class Lifetime {
 	///
 	/// - parameters:
 	///   - cancellable: The cancellable to be disposed of when `self` ends.
+	public func store( cancellable: AnyCancellable, with id: String? = nil ) {
+		token?.append( cancellable, id: id )
+	}
+
+	/// Add the given cancellable as an observer of `self`.
+	///
+	/// - parameters:
+	///   - cancellable: The cancellable to be disposed of when `self` ends.
 	public static func += ( lifetime: Lifetime, cancellable: AnyCancellable ) {
-		lifetime.token?.cancellables.append( cancellable )
+		lifetime.store( cancellable: cancellable )
+	}
+
+	/// Observe the termination of `self`.
+	///
+	/// - parameters:
+	///   - action: The action to be invoked when `self` ends.
+	public func observeEnded( id: String? = nil, _ action: @escaping () -> Void ) {
+		token?.appendFirst( AnyCancellable( action ), id: id )
 	}
 
 	/// Observe the termination of `self`.
@@ -44,15 +60,7 @@ public final class Lifetime {
 	/// - parameters:
 	///   - action: The action to be invoked when `self` ends.
 	public static func += ( lifetime: Lifetime, action: @escaping () -> Void ) {
-		lifetime.token?.cancellables.insert( AnyCancellable( action ), at: 0 )
-	}
-
-	/// Observe the termination of `self`.
-	///
-	/// - parameters:
-	///   - action: The action to be invoked when `self` ends.
-	public func observeEnded( _ action: @escaping () -> Void ) {
-		token?.cancellables.insert( AnyCancellable( action ), at: 0 )
+		lifetime.observeEnded( action )
 	}
 
 	/// A flag indicating whether the lifetime has ended.
@@ -88,11 +96,43 @@ public extension Lifetime {
 		Lifetime( persistentToken )
 	}()
 	private static let persistentToken = Token()
-
 }
+
 
 @available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 public extension Lifetime {
+	/// Check if there is a cancellable with `id` identificator.
+	///
+	/// - parameter id: Id of a cancellable to search.
+	func contains( id: String ) -> Bool {
+		token?.contains( id: id ) ?? false
+	}
+
+	/// Removes cancellable with `id` identificator.
+	/// Does nothing if cancellable with this identificator is not found.
+	///
+	/// - parameter id: Id of a cancellable to remove.
+	func remove( id: String ) {
+		token?.remove( id: id )
+	}
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension AnyCancellable {
+
+	/// Stores this type-erasing cancellable instance in the specified collection.
+	///
+	/// - Parameter collection: The collection in which to store this ``AnyCancellable``.
+	public func store( in lifetime: Lifetime, id: String? = nil ) {
+		lifetime.store( cancellable: self, with: id )
+	}
+}
+
+
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+public extension Lifetime {
+
 	/// A token object which completes its associated `Lifetime` when
 	/// it deinitializes, or when `cancel()` is called.
 	///
@@ -106,22 +146,49 @@ public extension Lifetime {
 	/// ```
 	final class Token {
 
-		init( cancellable: AnyCancellable? = nil ) {
+		init( cancellable: AnyCancellable? = nil, id: String? = nil ) {
 			if let cancellable = cancellable {
-				cancellables = [ cancellable ]
+				append( cancellable, id: id )
 			}
 		}
 
 		public func cancel() {
 			isCancelled = true
-			cancellables.forEach { $0.cancel() }
+			let copy = cancellables
+			copy.forEach { $0.cancellable.cancel() }
 			cancellables.removeAll()
+		}
+
+		fileprivate func contains( id: String ) -> Bool {
+			os_unfair_lock_lock( &lock ); defer { os_unfair_lock_unlock( &lock ) }
+			return cancellables.contains { $0.id == id }
+		}
+
+		fileprivate func remove( id: String ) {
+			os_unfair_lock_lock( &lock ); defer { os_unfair_lock_unlock( &lock ) }
+			if let index = cancellables.firstIndex( where: { $0.id == id } ) {
+				cancellables.remove( at: index )
+			}
+		}
+
+		fileprivate func append( _ cancellable: AnyCancellable, id: String? = nil ) {
+			os_unfair_lock_lock( &lock ); defer { os_unfair_lock_unlock( &lock ) }
+			cancellables.append( (id ?? randomId(), cancellable) )
+		}
+		fileprivate func appendFirst( _ cancellable: AnyCancellable, id: String? = nil ) {
+			os_unfair_lock_lock( &lock ); defer { os_unfair_lock_unlock( &lock ) }
+			cancellables.insert( (id ?? randomId(), cancellable), at: 0 )
 		}
 
 		deinit { cancel() }
 
-		fileprivate var cancellables = Array<AnyCancellable>()
+		private typealias Value = ( id: String, cancellable: AnyCancellable )
+
+		private var lock = os_unfair_lock()
+		private var cancellables = Array<Value>()
 		fileprivate var isCancelled: Bool = false
+
+		private func randomId() -> String { UUID().uuidString }
 	}
 }
 
