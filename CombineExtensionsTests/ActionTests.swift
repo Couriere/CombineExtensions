@@ -63,7 +63,7 @@ class ActionTests: XCTestCase {
 						sink.send( parameter * parameter )
 						sink.send( completion: .finished )
 					} else {
-						sink.send( testError )
+						sink.send( self.testError )
 					}
 				}
 			}
