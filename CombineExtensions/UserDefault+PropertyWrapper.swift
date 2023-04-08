@@ -33,7 +33,7 @@ import Combine
 ///		.sink { print( $0 ) }
 /// ```
 ///
-@available( iOS 13.0, tvOS 13.0, * )
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 @propertyWrapper
 public struct UserDefault<Value: Codable>: DynamicProperty {
 
@@ -154,7 +154,7 @@ public struct UserDefault<Value: Codable>: DynamicProperty {
 	}
 }
 
-@available( iOS 13.0, tvOS 13.0, * )
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 extension UserDefault where Value : ExpressibleByNilLiteral {
 
 	public init(_ key: String, store: UserDefaults? = nil) where Value: Codable {
@@ -165,7 +165,7 @@ extension UserDefault where Value : ExpressibleByNilLiteral {
 	}
 }
 
-@available( iOS 13.0, tvOS 13.0, * )
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
 private extension UserDefault {
 
 	final class _TriggerPublisher: ObservableObject {
@@ -174,6 +174,16 @@ private extension UserDefault {
 			cancellable = triggerPublisher.sink { [unowned self] _ in
 				self.objectWillChange.send()
 			}
+		}
+	}
+}
+
+@available(OSX 10.15, iOS 13, tvOS 13, watchOS 6, *)
+extension UserDefault: BindingTargetProvider {
+
+	public var bindingTarget: BindingTarget<Value> {
+		return BindingTarget( lifetime: .persistent ) {
+			wrappedValue = $0
 		}
 	}
 }
